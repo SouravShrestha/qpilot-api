@@ -1,0 +1,72 @@
+name: Master Pipeline
+
+on:
+  push:
+    branches:
+      - "**"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  deploy-test:
+    if: "github.event_name != 'push' || (github.event.head_commit && !startsWith(github.event.head_commit.message, 'chore(main): release') && !startsWith(github.event.head_commit.message, 'chore: release'))"
+    uses: ./.github/workflows/deploy-test.yml
+    secrets: inherit
+
+  release:
+    needs: deploy-test
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/release.yml
+    secrets: inherit
+
+  deploy-prod:
+    needs: release
+    if: ${{ needs.release.outputs.release_created == 'true' }}
+    uses: ./.github/workflows/deploy-prod.yml
+    with:
+      tag_name: ${{ needs.release.outputs.tag_name }}
+    secrets: inherit
+
+  pipeline-status:
+    needs: [deploy-test, release, deploy-prod]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report
+        run: |
+          echo "| Job | Status | Details |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|---|" >> $GITHUB_STEP_SUMMARY
+
+          # Test Deploy
+          TEST_RES="${{ needs.deploy-test.result }}"
+          if [ "$TEST_RES" == "success" ]; then
+            echo "| Deploy to Test | ✅ Success | [https://test-api.qpilot.cbsdev.me/v1/health](https://test-api.qpilot.cbsdev.me/v1/health) |" >> $GITHUB_STEP_SUMMARY
+          elif [ "$TEST_RES" == "skipped" ] || [ -z "$TEST_RES" ]; then
+            echo "| Deploy to Test | ⏭️ Skipped | - |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Deploy to Test | ❌ Failed | - |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Release
+          REL_RES="${{ needs.release.result }}"
+          REL_CREATED="${{ needs.release.outputs.release_created }}"
+          REL_TAG="${{ needs.release.outputs.tag_name }}"
+          if [ "$REL_RES" == "success" ] && [ "$REL_CREATED" == "true" ]; then
+            echo "| Release | ✅ Created | Tag: \`$REL_TAG\` |" >> $GITHUB_STEP_SUMMARY
+          elif [ "$REL_RES" == "success" ] || [ "$REL_RES" == "skipped" ] || [ -z "$REL_RES" ]; then
+            echo "| Release | ⏭️ Skipped | - |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Release | ❌ Failed | - |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Prod Deploy
+          PROD_RES="${{ needs.deploy-prod.result }}"
+          if [ "$PROD_RES" == "success" ]; then
+            echo "| Deploy to Prod | ✅ Success | [https://api.qpilot.cbsdev.me/v1/health](https://api.qpilot.cbsdev.me/v1/health) |" >> $GITHUB_STEP_SUMMARY
+          elif [ "$PROD_RES" == "skipped" ] || [ -z "$PROD_RES" ]; then
+            echo "| Deploy to Prod | ⏭️ Skipped | - |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Deploy to Prod | ❌ Failed | - |" >> $GITHUB_STEP_SUMMARY
+          fi
