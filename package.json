@@ -1,0 +1,34 @@
+{
+  "name": "qpilot-api",
+  "version": "1.0.0",
+  "description": "LLM-powered Q&A generation API built on Cloudflare Workers",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy:test": "wrangler deploy --env test",
+    "deploy:production": "wrangler deploy --env production",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SouravShrestha/qpilot-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SouravShrestha/qpilot-api/issues"
+  },
+  "homepage": "https://github.com/SouravShrestha/qpilot-api#readme",
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.16.18",
+    "@cloudflare/workers-types": "^4.20260621.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9",
+    "wrangler": "^4.103.0"
+  },
+  "dependencies": {
+    "jsonrepair": "^3.14.0"
+  }
+}
