@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.0 (2026-06-23)
+
+
+### Features
+
+* initial project setup ([4b57a75](https://github.com/SouravShrestha/qpilot-api/commit/4b57a75ee4ca1138323c3b4fbbbe0dc5629139c2))
+* Initial setup ([229ae04](https://github.com/SouravShrestha/qpilot-api/commit/229ae04cf437b8f0c04f9f7ec299230691e0b4e1))
+* Initial setup (merge pull request [#1](https://github.com/SouravShrestha/qpilot-api/issues/1) from initial-setup) ([229ae04](https://github.com/SouravShrestha/qpilot-api/commit/229ae04cf437b8f0c04f9f7ec299230691e0b4e1))
+
 ## 1.0.0 (2026-06-21)
 
 
