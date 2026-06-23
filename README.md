@@ -26,10 +26,11 @@ Generates or fetches questions based on the configuration provided in the JSON b
 **POST** `/v1/generate`
 
 #### Request Body
+
 ```json
 {
   "topic": "Docker",
-  "difficulty": "medium", 
+  "difficulty": "medium",
   "includeExamples": true,
   "offset": 0,
   "limit": 15
@@ -37,12 +38,13 @@ Generates or fetches questions based on the configuration provided in the JSON b
 ```
 
 **Parameters:**
-- `topic` *(string, required)*: The subject you want questions about (e.g., "React", "Docker", "Go").
-- `difficulty` *(string, required)*: The difficulty level of the questions. Must be one of `easy`, `medium`, `hard`, or `mixed`.
-- `includeExamples` *(boolean, optional)*: Whether the LLM should include code/text examples in the answers. Defaults to `true`.
-- `offset` *(number, optional)*: The starting index for pagination. Used to fetch subsequent batches of questions from the cache. Defaults to `0`.
-- `limit` *(number, optional)*: The number of questions to return. Defaults to `15`.
-- `forceRefresh` *(boolean, optional)*: If `true`, ignores the current cache and forces the LLM to generate a fresh set of questions (it reads the old cache first to ensure no duplicates are made).
+
+- `topic` _(string, required)_: The subject you want questions about (e.g., "React", "Docker", "Go").
+- `difficulty` _(string, required)_: The difficulty level of the questions. Must be one of `easy`, `medium`, `hard`, or `mixed`.
+- `includeExamples` _(boolean, optional)_: Whether the LLM should include code/text examples in the answers. Defaults to `true`.
+- `offset` _(number, optional)_: The starting index for pagination. Used to fetch subsequent batches of questions from the cache. Defaults to `0`.
+- `limit` _(number, optional)_: The number of questions to return. Defaults to `15`.
+- `forceRefresh` _(boolean, optional)_: If `true`, ignores the current cache and forces the LLM to generate a fresh set of questions (it reads the old cache first to ensure no duplicates are made).
 
 #### Response
 
@@ -86,11 +88,13 @@ The API returns a JSON response containing an array of questions. Each individua
 ## Local Development
 
 Install dependencies:
+
 ```bash
 npm install
 ```
 
 Start the local Cloudflare Worker development server:
+
 ```bash
 npx wrangler dev
 ```
