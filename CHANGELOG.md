@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.1.0](https://github.com/SouravShrestha/qpilot-api/compare/v1.0.0...v1.1.0) (2026-06-23)
+
+
+### Features
+
+* update application logo image ([08a4269](https://github.com/SouravShrestha/qpilot-api/commit/08a4269f4ac1f3a17f390a8d18db6a373f07a2f1))
+* update application logo image ([0c591a0](https://github.com/SouravShrestha/qpilot-api/commit/0c591a07303cb00f3e7b28c09e37954623b7ae01))
+* update application logo image (merge pull request [#3](https://github.com/SouravShrestha/qpilot-api/issues/3) from f/update-logo) ([08a4269](https://github.com/SouravShrestha/qpilot-api/commit/08a4269f4ac1f3a17f390a8d18db6a373f07a2f1))
+
 ## 1.0.0 (2026-06-23)
 
 
