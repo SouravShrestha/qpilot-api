@@ -1,87 +1,158 @@
 # QPilot API
 
-QPilot is an LLM-powered backend service built with Cloudflare Workers designed to generate and cache programming and technical questions on demand.
+QPilot is an LLM-powered question generation service built on Cloudflare Workers. Given any learning topic and a difficulty level, it returns a set of study-ready questions and answers, a short definition of the topic, and five related topics to explore next.
 
-## Features
-
-- **Dynamic Question Generation**: Automatically generates questions based on any provided software engineering topic.
-- **Difficulty Levels**: Supports `easy`, `medium`, `hard`, and `mixed` difficulty questions. The difficulty is returned both at the summary level and for each individual question.
-- **Accumulative Caching & Pagination**: Uses a smart caching layer with `offset` and `limit`. As you request more questions, new questions are generated and appended to the cache to progressively grow the pool. Requests within the cached length are served instantly without hitting the LLM.
-- **Code Examples**: Questions can optionally include code snippets or text examples.
+Topics can span any genuine subject — history, science, mathematics, cooking, music theory, medicine, languages, philosophy, software engineering, and more.
 
 ---
 
-## Endpoint Documentation
+## Features
+
+- **Universal topic support** — any coherent, learnable subject is accepted. Overly broad inputs ("History", "Science") are rejected with narrowing suggestions.
+- **Difficulty levels** — `easy`, `medium`, `hard`, or `mixed`. Each question carries its own difficulty field, which is useful when requesting `mixed`.
+- **Topic definition** — every response includes a concise 1–2 sentence definition of the requested topic.
+- **Recommendations** — every response includes five related topics to explore next.
+- **Accumulative caching** — questions are cached per topic/difficulty combination and grown progressively. Requests within the cached pool are served instantly without calling the LLM.
+- **Pagination** — use `offset` and `limit` to page through the cached question pool.
+- **Optional examples** — answers can include code snippets (for technical topics) or text-based analogies and scenarios.
+
+---
+
+## Authentication
+
+All requests require an `X-API-Key` header.
+
+```
+X-API-Key: <your-api-key>
+```
+
+To use a personal LLM API key instead of the server's default, pass it in the `X-LLM-API-Key` header.
+
+---
+
+## API Reference
 
 ### Health Check
 
+**GET** `/v1/health`
+
 Returns the health status of the API.
 
-**GET** `/v1/health`
+---
 
 ### Generate Questions
 
-Generates or fetches questions based on the configuration provided in the JSON body.
-
 **POST** `/v1/generate`
+
+Generates or retrieves questions for a given topic and difficulty.
 
 #### Request Body
 
 ```json
 {
-  "topic": "Docker",
+  "topic": "The French Revolution",
   "difficulty": "medium",
   "includeExamples": true,
-  "offset": 0,
-  "limit": 15
+  "limit": 10,
+  "offset": 0
 }
 ```
 
-**Parameters:**
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `topic` | string | Yes | The subject to generate questions about. Must be a specific, learnable topic (max 100 characters). |
+| `difficulty` | string | Yes | `easy`, `medium`, `hard`, or `mixed`. |
+| `includeExamples` | boolean | No | Whether to include examples with each answer. Defaults to `true`. |
+| `limit` | number | No | Number of questions to return (1–50). Defaults to `15`. |
+| `offset` | number | No | Starting index for pagination. Defaults to `0`. |
+| `forceRefresh` | boolean | No | If `true`, bypasses the cache and generates a fresh batch (deduplication against the existing cache is still applied). Defaults to `false`. |
 
-- `topic` _(string, required)_: The subject you want questions about (e.g., "React", "Docker", "Go").
-- `difficulty` _(string, required)_: The difficulty level of the questions. Must be one of `easy`, `medium`, `hard`, or `mixed`.
-- `includeExamples` _(boolean, optional)_: Whether the LLM should include code/text examples in the answers. Defaults to `true`.
-- `offset` _(number, optional)_: The starting index for pagination. Used to fetch subsequent batches of questions from the cache. Defaults to `0`.
-- `limit` _(number, optional)_: The number of questions to return. Defaults to `15`.
-- `forceRefresh` _(boolean, optional)_: If `true`, ignores the current cache and forces the LLM to generate a fresh set of questions (it reads the old cache first to ensure no duplicates are made).
-
-#### Response
-
-The API returns a JSON response containing an array of questions. Each individual question explicitly states its difficulty level (useful when requesting `mixed`).
+#### Success Response
 
 ```json
 {
   "success": true,
-  "validation_reasoning": "Brief explanation of topic validation...",
-  "topic": "Docker",
+  "validation_reasoning": "The French Revolution is a specific, well-defined historical event with a clear scope.",
+  "topic": "The French Revolution",
   "difficulty": "medium",
+  "definition": "The French Revolution (1789–1799) was a period of radical political and social transformation in France that overthrew the monarchy, established a republic, and fundamentally reshaped European politics and society.",
+  "recommendations": [
+    "The Reign of Terror",
+    "Napoleon Bonaparte",
+    "The Enlightenment",
+    "The American Revolution",
+    "The Congress of Vienna"
+  ],
   "questions": [
     {
       "id": 1,
-      "question": "What is the difference between a Docker image and a container?",
-      "answer": "An image is a read-only template that contains a set of instructions...",
+      "question": "What role did Enlightenment philosophy play in driving the French Revolution?",
+      "answer": "Enlightenment thinkers such as Rousseau, Voltaire, and Montesquieu challenged the divine right of kings and promoted ideas of individual liberty, popular sovereignty, and the social contract. These ideas gave the educated bourgeoisie an intellectual framework to question the legitimacy of absolute monarchy and the privileges of the clergy and nobility. The Declaration of the Rights of Man (1789) directly reflects these philosophical foundations.",
       "difficulty": "medium",
       "example": {
-        "type": "code",
-        "content": "docker run -it ubuntu bash"
+        "type": "text",
+        "content": "Rousseau's concept of the 'general will' — that legitimate authority derives from the collective will of the people — was directly cited by revolutionary leaders to justify dismantling the monarchy."
       }
     }
   ]
 }
 ```
 
+#### Error Response
+
+When the topic fails validation, the API returns an error with one of three error codes.
+
+```json
+{
+  "success": false,
+  "validation_reasoning": "History is a sweeping meta-category containing thousands of unrelated events, periods, and sub-disciplines.",
+  "errorCode": "TOPIC_TOO_BROAD",
+  "message": "Please enter a more specific topic.",
+  "suggestions": [
+    "The French Revolution",
+    "World War II — The Pacific Theatre",
+    "The Roman Republic",
+    "The Cold War",
+    "The Renaissance"
+  ]
+}
+```
+
+| Error Code | HTTP Status | Cause |
+|---|---|---|
+| `INVALID_DIFFICULTY` | 400 | `difficulty` is not one of the four valid values. |
+| `TOPIC_TOO_BROAD` | 422 | The topic is a broad category rather than a specific concept, event, or subject. |
+| `UNSUPPORTED_TOPIC` | 422 | The topic is incoherent, harmful, or not a learnable subject. |
+
+---
+
+## Caching Behaviour
+
+Questions are cached per `(topic, difficulty, includeExamples)` combination with a configurable TTL (default 24 hours).
+
+The cache grows over time. When you request questions beyond the current cached pool, the API generates only the additional questions needed and appends them. Subsequent requests within the cached range are served without calling the LLM. This means the first request for a topic is slower; subsequent requests are near-instant.
+
+Use `offset` and `limit` to page through the pool:
+
+```json
+{ "topic": "Stoicism", "difficulty": "easy", "limit": 10, "offset": 0 }   // questions 1–10
+{ "topic": "Stoicism", "difficulty": "easy", "limit": 10, "offset": 10 }  // questions 11–20
+```
+
 ---
 
 ## Project Structure
 
-- `src/handlers/` - Request handlers for API routes (e.g., `v1/generate`, `v1/health`)
-- `src/lib/` - Core libraries (router, cors)
-- `src/middleware/` - Middlewares (auth, validator, errorHandler, rateLimiter)
-- `src/prompts/` - LLM prompt templates
-- `src/providers/` - Third-party integrations (e.g., LLM providers)
-- `src/repositories/` - Data access layer (following the repository pattern with interfaces)
-- `src/types.ts` - Shared TypeScript definitions
+```
+src/
+├── handlers/v1/        # Route handlers (generate, health)
+├── lib/                # Router, CORS, prompt builder
+├── middleware/         # Auth, rate limiter, validator, error handler
+├── prompts/            # LLM prompt templates (persona, validation, generation, schema, etc.)
+├── providers/          # LLM provider abstraction (Groq)
+├── repositories/       # Cache interface and Cloudflare KV implementation
+└── types.ts            # Shared TypeScript types
+```
 
 ---
 
@@ -93,7 +164,7 @@ Install dependencies:
 npm install
 ```
 
-Start the local Cloudflare Worker development server:
+Start the local development server:
 
 ```bash
 npx wrangler dev
