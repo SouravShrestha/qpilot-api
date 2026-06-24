@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.0](https://github.com/SouravShrestha/qpilot-api/compare/v1.1.0...v1.2.0) (2026-06-24)
+
+
+### Features
+
+* add recommendations and definition to success response ([779e48c](https://github.com/SouravShrestha/qpilot-api/commit/779e48cb3df9e4b7a75a06d1674f260c36c293b6))
+* add recommendations and definition to success response ([f6a78d9](https://github.com/SouravShrestha/qpilot-api/commit/f6a78d9bad20830e1fae3438a2e52b3a9e32dd72))
+
 ## [1.1.0](https://github.com/SouravShrestha/qpilot-api/compare/v1.0.0...v1.1.0) (2026-06-23)
 
 

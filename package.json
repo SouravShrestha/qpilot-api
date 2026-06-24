@@ -1,6 +1,6 @@
 {
   "name": "qpilot-api",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "LLM-powered Q&A generation API built on Cloudflare Workers",
   "scripts": {
     "dev": "wrangler dev",
