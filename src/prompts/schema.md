@@ -44,7 +44,7 @@ Note: Always provide exactly 5 suggestions. For INVALID_DIFFICULTY they are the 
 
 FULL SUCCESS EXAMPLE (topic: "Docker", difficulty: "easy", includeExamples: true):
 {
-  "validation_reasoning": "Docker is a specific containerisation platform — a valid, specific software engineering topic.",
+  "validation_reasoning": "Docker is a specific containerisation platform — a concrete, well-scoped topic.",
   "success": true,
   "topic": "Docker",
   "difficulty": "easy",
@@ -59,6 +59,30 @@ FULL SUCCESS EXAMPLE (topic: "Docker", difficulty: "easy", includeExamples: true
       "example": {
         "type": "code",
         "content": "```bash\n# Build an image from a Dockerfile\ndocker build -t my-app .\n\n# Run a container from that image\ndocker run -d -p 3000:3000 my-app\n```"
+      }
+    }
+  ]
+}
+
+---
+
+FULL SUCCESS EXAMPLE (topic: "The French Revolution", difficulty: "easy", includeExamples: true):
+{
+  "validation_reasoning": "The French Revolution is a specific, well-defined historical event — not too broad and not incoherent.",
+  "success": true,
+  "topic": "The French Revolution",
+  "difficulty": "easy",
+  "definition": "The French Revolution (1789–1799) was a period of radical political and social transformation in France that overthrew the monarchy, established a republic, and fundamentally reshaped European politics and society.",
+  "recommendations": ["The Reign of Terror", "Napoleon Bonaparte", "The Enlightenment", "The American Revolution", "The Congress of Vienna"],
+  "questions": [
+    {
+      "id": 1,
+      "question": "What were the three main social classes in pre-revolutionary France, and why did their structure contribute to the Revolution?",
+      "answer": "Pre-revolutionary France was divided into the First Estate (clergy), Second Estate (nobility), and Third Estate (everyone else — peasants, urban workers, and the bourgeoisie). The Third Estate comprised roughly 97% of the population but paid the vast majority of taxes and had almost no political representation. This deep inequality, combined with Enlightenment ideas about individual rights and popular sovereignty, created the conditions for revolt.",
+      "difficulty": "easy",
+      "example": {
+        "type": "text",
+        "content": "Imagine a company where 97% of employees do all the work and pay all costs, while 3% of managers are exempt from taxes and hold all decision-making power. The resentment that builds over time mirrors the social pressures that exploded in 1789."
       }
     }
   ]
