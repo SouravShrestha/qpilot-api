@@ -40,6 +40,8 @@ export interface SuccessResponse {
   validation_reasoning: string;
   topic: string;
   difficulty: string;
+  definition: string;
+  recommendations: string[];
   questions: Question[];
 }
 
