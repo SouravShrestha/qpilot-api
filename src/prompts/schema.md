@@ -6,6 +6,8 @@ On success, return exactly this shape:
   "success": true,
   "topic": "{{topic}}",
   "difficulty": "{{difficulty}}",
+  "definition": "<a concise 1–2 sentence definition of the topic>",
+  "recommendations": ["<related topic 1>", "<related topic 2>", "<related topic 3>", "<related topic 4>", "<related topic 5>"],
   "questions": [
     {
       "id": 1,
@@ -22,6 +24,8 @@ On success, return exactly this shape:
 
 Note: The "difficulty" on each question must always be "easy", "medium", or "hard" — never "mixed".
 Note: The "example" field is either a valid object (as above) or absent entirely — never null, never an empty object.
+Note: "definition" is a short, plain-English description of the topic (1–2 sentences).
+Note: "recommendations" must always be exactly 5 strings — each a closely related topic the user might want to explore next.
 
 ---
 
@@ -44,6 +48,8 @@ FULL SUCCESS EXAMPLE (topic: "Docker", difficulty: "easy", includeExamples: true
   "success": true,
   "topic": "Docker",
   "difficulty": "easy",
+  "definition": "Docker is an open-source platform that enables developers to package applications and their dependencies into portable, isolated containers that run consistently across environments.",
+  "recommendations": ["Kubernetes", "Docker Compose", "Container Security", "Podman", "CI/CD Pipelines"],
   "questions": [
     {
       "id": 1,

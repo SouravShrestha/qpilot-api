@@ -74,7 +74,7 @@ export const handleGenerate: RouteHandler = async (request, env) => {
   const cachedQuestions: any[] =
     cached && cached.success && Array.isArray(cached.questions) ? cached.questions : [];
   const baseFields = cached && cached.success
-    ? { validation_reasoning: cached.validation_reasoning, topic: cached.topic, difficulty: cached.difficulty }
+    ? { validation_reasoning: cached.validation_reasoning, topic: cached.topic, difficulty: cached.difficulty, definition: cached.definition, recommendations: cached.recommendations }
     : {};
 
   if (!forceRefresh && cachedQuestions.length >= offset + limit) {
